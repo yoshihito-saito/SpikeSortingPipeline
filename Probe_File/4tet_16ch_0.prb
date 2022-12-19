@@ -1,0 +1,41 @@
+import pandas as pd
+import numpy as np
+import numpy.matlib
+
+dx=np.sqrt(25**2/2)
+dy=np.sqrt(25**2/2)
+h=150
+
+chnum = 16
+#channels   = [20,28,11,32,30,24,22,21,18,17,26,19,7,25,9,23,4,16,6,14,2,8,12,5,10,1,27,3,29,15,31,13,63,59,60,49,56,51,53,57,61,42,52,55,64,46,62,48,45,41,44,33,40,39,37,47,35,43,36,58,38,50,34,54,]
+channels = [i for i in range(chnum)]
+#channels = [k-1 for k in channels]
+
+shank =np.ones([chnum,1])
+
+shank[0:8]=1
+shank[8:16]=2
+
+tetgeo=np.zeros([4,2])
+tetgeo[:,0]=[dx,0,2*dx,dx]
+tetgeo[:,1]=[2*dy,dy,dy,0]
+
+geometry=np.matlib.repmat(tetgeo,2,1)
+geometry[0:4,1]=geometry[0:4,1]+h
+geometry[4:8,1]=geometry[4:8,1]+2*h
+
+geometry=np.matlib.repmat(geometry,2,1)
+geometry[:,0]=geometry[:,0]+(shank[:,0]-1)*200
+
+g=[]
+for i in range(0,len(geometry)):
+    g_p=[geometry[i,0],geometry[i,1]] 
+    g.append(g_p)
+    
+channel_groups={}
+for k in range(0,4):
+    channel_groups[k]={
+            'channels': [channels[4*k],channels[4*k+1],channels[4*k+2],channels[4*k+3]],
+            'geometry': {channels[4*k]: g[4*k:4*k+4][0], channels[4*k+1]: g[4*k:4*k+4][1], channels[4*k+2]: g[4*k:4*k+4][2], channels[4*k+3]: g[4*k:4*k+4][3]},
+            # 'label': [4*k,4*k+1,4*k+2,4*k+3]
+        }
